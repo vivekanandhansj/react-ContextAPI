@@ -1,9 +1,61 @@
-import React, { useContext } from "react";
+import React, {useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import UserContext from "./UserContext";
+import swal from "sweetalert";
+import axios from "axios";
 
 function Product() {
-  const userContext = useContext(UserContext);
+  const [productData, setProducts] = useState([]);
+useEffect(()=>{
+
+  async function fetchData() {
+    let product = await axios.get(
+      "https://62283fa09fd6174ca81e7895.mockapi.io/product"
+    );
+    console.log(product.data);
+    setProducts(product.data);
+  }
+  fetchData();
+}, []);
+const deleteUser = (id) => {
+  swal({
+    title: "Are you sure?",
+    text: "Once deleted, you will not be able to recover this imaginary file!",
+    icon: "warning",
+    buttons: true,
+    dangerMode: true,
+  }).then((willDelete) => {
+    if (willDelete) {
+      axios
+        .delete(`https://62283fa09fd6174ca81e7895.mockapi.io/Users/${id}`)
+        .then(() => {
+          getData();
+        });
+
+      swal(" Your file has been deleted!", {
+        icon: "success",
+      });
+    } else {
+      swal("Your file is safe!");
+    }
+  });
+};
+
+const getData = () => {
+  axios
+    .get(`https://62283fa09fd6174ca81e7895.mockapi.io/Users/`)
+    .then((getData) => {
+      setProducts(getData.data);
+    });
+};
+
+
+
+
+
+
+
+
+
 
 
   return (
@@ -52,7 +104,7 @@ function Product() {
                 </tr>
               </tfoot>
               <tbody>
-                {userContext.product.map((product,index) => {
+                {productData.map((product,index) => {
                   return (
                     <tr>
                       <td>{product.name}</td>
@@ -63,19 +115,21 @@ function Product() {
 
                       <td>
                         <Link
-                          to={`/product-view/${index}`}
+                          to={`/product-view/${product.id}`}
                           className="btn btn-secondary btn-sm"
                         >
                           View
                         </Link>{" "}
                         <Link
-                          to={`/product-edit/${index}`}
+                          to={`/product-edit/${product.id}`}
                           className="btn btn-primary btn-sm"
                         >
                           {" "}
                           Edit
                         </Link>{" "}
-                        <button className="btn btn-danger btn-sm">
+                        <button 
+                         onClick={() => deleteUser(productData.id)}
+                        className="btn btn-danger btn-sm">
                           {" "}
                           Delete
                         </button>

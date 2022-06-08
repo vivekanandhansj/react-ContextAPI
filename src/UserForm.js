@@ -1,10 +1,12 @@
 import React, { useContext } from "react";
 import {  useFormik } from "formik";
 import UserContext from "./UserContext";
-
+import axios from "axios";
+import {useNavigate} from "react-router-dom";
 function UserForm()  {
 
     const userContext = useContext(UserContext)
+    const navigate = useNavigate();
     let formik = useFormik({
       initialValues: {
         name: "",
@@ -19,19 +21,37 @@ function UserForm()  {
         if (!values.name) {
           errors.name = "plz enter your name";
         }
+        if (!values.position) {
+          errors.position = "plz enter your position";
+        }
+        if (!values.office) {
+          errors.office = "plz enter your office";
+        }
         if (!values.age|| values.age < 18) {
           errors.age = "Age is required and should be greater than 18";
         }
-  
+        if (!values.startdate) {
+          errors.startdate = "plz enter your startdate";
+        }
+        if (!values.salary) {
+          errors.salary = "plz enter your salary";
+        }
+
         return errors;
       },
   
-      onSubmit: (values) => {
-        console.log(values);
-        userContext.setUsers([...userContext.users,values])
-      },
+      onSubmit: async (values) => {
+        // console.log(values);
+        // userContext.setUsers([...userContext.users,values])
+       try {
+          await axios.post("https://62283fa09fd6174ca81e7895.mockapi.io/Users",values )
+          userContext.setUsers([...userContext.users,values])
+        }
+       catch (error) {console.log(error)};
+       navigate("/Users", { replace: true });
+      }
     });
-  
+    
     return (
       <>
         <div className="container">
@@ -60,8 +80,9 @@ function UserForm()  {
                   onChange={formik.handleChange}
                   value={formik.values.position}
                   className="form-control"
-                
+                  style={{border: formik.errors.position ? "1px solid red":" "  }}
                 />
+                <span style={{color:"red "}}>{formik.errors.position}</span>
               </div>
               <div className="col-lg-6">
                 <label>Office</label>
@@ -71,7 +92,9 @@ function UserForm()  {
                   onChange={formik.handleChange}
                   value={formik.values.office}
                   className="form-control"
+                  style={{border: formik.errors.office ? "1px solid red":" "  }}
                 />
+                <span style={{color:"red "}}>{formik.errors.office}</span>
               </div>
               <div className="col-lg-6">
                 <label>Age</label>
@@ -81,6 +104,7 @@ function UserForm()  {
                   onChange={formik.handleChange}
                   value={formik.values.age}
                   className="form-control"
+                  
                   style={{border: formik.errors.age ? "1px solid red":" "  }}
                 /><span style={{color:"red "}}>{formik.errors.age}</span>
               </div>
@@ -92,7 +116,9 @@ function UserForm()  {
                   onChange={formik.handleChange}
                   value={formik.values.startdate}
                   className="form-control"
+                  style={{border: formik.errors.startdate ? "1px solid red":" "  }}
                 />
+                <span style={{color:"red "}}>{formik.errors.startdate}</span>
               </div>
               <div className="col-lg-6">
                 <label>Salary</label>
@@ -102,7 +128,9 @@ function UserForm()  {
                   onChange={formik.handleChange}
                   value={formik.values.salary}
                   className="form-control"
+                  style={{border: formik.errors.salary ? "1px solid red":" "  }}
                 />
+                 <span style={{color:"red "}}>{formik.errors.salary}</span>
               </div>
               <div className="col-lg-6 mt-3">
                 <input disabled={Object.keys(formik.errors).length !== 0} type={"submit"} className="btn btn-primary" />

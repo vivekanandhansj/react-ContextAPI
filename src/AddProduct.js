@@ -1,11 +1,13 @@
 import React,{useContext} from 'react';
 import {  useFormik } from "formik";
 import UserContext from './UserContext';
+import axios from "axios";
+import {useNavigate} from "react-router-dom";
 
 function AddProduct() {
 
     const userContext= useContext(UserContext)
-
+    const navigate = useNavigate();
     let formik = useFormik({
         initialValues: {
           name: "",
@@ -37,9 +39,17 @@ function AddProduct() {
           return errors;
         },
     
-        onSubmit: (values) => {
-          console.log(values);
-          userContext.setProduct([...userContext.product,values])
+        onSubmit: async(values) => {
+          // console.log(values);
+          // userContext.setProduct([...userContext.product,values])
+
+   try {
+          await axios.post("https://62283fa09fd6174ca81e7895.mockapi.io/product",values )
+          userContext.setProducts([...userContext.product,values])
+        }
+       catch (error) {console.log(error)}
+
+       navigate("/Products", { replace: true });
         },
       });
 
